@@ -67,8 +67,36 @@ class Bpftime < Formula
                 endif()
               CMAKE
 
+    mkdir_p "homebrew-compat/include/asm"
+    mkdir_p "homebrew-compat/include/bpf"
+    ln_sf buildpath/"third_party/bpftool/libbpf/src/bpf.h",
+          "homebrew-compat/include/bpf/bpf.h"
+    (buildpath/"homebrew-compat/include/asm/types.h").write <<~C
+      #pragma once
+      #include <stdint.h>
+
+      typedef int8_t __s8;
+      typedef uint8_t __u8;
+      typedef int16_t __s16;
+      typedef uint16_t __u16;
+      typedef int32_t __s32;
+      typedef uint32_t __u32;
+      typedef int64_t __s64;
+      typedef uint64_t __u64;
+    C
+    (buildpath/"homebrew-compat/include/asm/posix_types.h").write <<~C
+      #pragma once
+    C
+
+    compat_include = buildpath/"homebrew-compat/include"
+    libbpf_source = buildpath/"third_party/bpftool/libbpf"
     ENV.append "LDFLAGS", "-L#{Formula["ncurses"].opt_lib}"
     ENV.append "CPPFLAGS", "-I#{Formula["boost"].opt_include}"
+    ENV.append "CPPFLAGS", "-I#{compat_include}"
+    ENV.append "CPPFLAGS", "-I#{libbpf_source}/include/uapi"
+    ENV.append "CPPFLAGS", "-I#{libbpf_source}/include"
+    ENV.append "CPPFLAGS", "-I#{libbpf_source}/src"
+    ENV.append "CXXFLAGS", "-include #{buildpath}/runtime/include/spinlock_wrapper.hpp"
 
     args = %W[
       -DCMAKE_INSTALL_PREFIX=#{prefix}
