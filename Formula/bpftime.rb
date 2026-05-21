@@ -11,7 +11,7 @@ class Bpftime < Formula
 
   bottle do
     root_url "https://github.com/vickiegpt/homebrew-bpftime/releases/download/bpftime-0.2.0"
-    rebuild 1
+    rebuild 2
     sha256 cellar: :any, arm64_tahoe: "a710d65ad0936f374c5d1a46f78598c3e48e59861aab77fb3f14ab4d4e6100f8"
   end
 
