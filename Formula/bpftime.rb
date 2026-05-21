@@ -90,6 +90,13 @@ class Bpftime < Formula
 
     compat_include = buildpath/"homebrew-compat/include"
     libbpf_source = buildpath/"third_party/bpftool/libbpf"
+    compat_flags = %W[
+      -I#{compat_include}
+      -I#{libbpf_source}/include/uapi
+      -I#{libbpf_source}/include
+      -I#{libbpf_source}/src
+    ].join(" ")
+    compat_cxx_flags = "#{compat_flags} -include #{buildpath}/runtime/include/spinlock_wrapper.hpp"
     ENV.append "LDFLAGS", "-L#{Formula["ncurses"].opt_lib}"
     ENV.append "CPPFLAGS", "-I#{Formula["boost"].opt_include}"
     ENV.append "CPPFLAGS", "-I#{compat_include}"
@@ -110,6 +117,8 @@ class Bpftime < Formula
       -DBPFTIME_LLVM_JIT=OFF
       -DBPFTIME_UBPF_JIT=ON
       -DBoost_INCLUDE_DIR=#{Formula["boost"].opt_include}
+      -DCMAKE_C_FLAGS=#{compat_flags}
+      -DCMAKE_CXX_FLAGS=#{compat_cxx_flags}
       -DCMAKE_INSTALL_RPATH=#{libexec}
       -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
     ]
