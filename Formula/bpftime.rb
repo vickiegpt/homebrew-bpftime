@@ -9,6 +9,12 @@ class Bpftime < Formula
   license "MIT"
   head "https://github.com/eunomia-bpf/bpftime.git", branch: "master"
 
+  bottle do
+    root_url "https://github.com/vickiegpt/homebrew-bpftime/releases/download/bpftime-0.2.0"
+    rebuild 1
+    sha256 cellar: :any, arm64_tahoe: "a710d65ad0936f374c5d1a46f78598c3e48e59861aab77fb3f14ab4d4e6100f8"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "boost"
