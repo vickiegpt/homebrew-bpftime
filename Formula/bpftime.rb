@@ -57,6 +57,38 @@ class Bpftime < Formula
                 endif()
               CMAKE
 
+    inreplace "CMakeLists.txt",
+              "install(TARGETS bpftime-agent bpftime-syscall-server CONFIGURATIONS Release Debug RelWithDebInfo DESTINATION ${DEST_DIR})",
+              "install(TARGETS bpftime-agent CONFIGURATIONS Release Debug RelWithDebInfo DESTINATION ${DEST_DIR})"
+    inreplace "runtime/CMakeLists.txt",
+              "add_subdirectory(syscall-server)",
+              "if(NOT APPLE)\nadd_subdirectory(syscall-server)\nendif()"
+    inreplace "tools/cli/main.cpp",
+              "const char *strchrnul(",
+              "const char *bpftime_strchrnul("
+    inreplace "tools/cli/main.cpp",
+              "strchrnul(path, ':')",
+              "bpftime_strchrnul(path, ':')"
+
+    inreplace "vm/vm-core/CMakeLists.txt",
+              'target_link_options(bpftime_vm PUBLIC "-Wl,--whole-archive" "$<TARGET_FILE:bpftime_llvm_vm>" "-Wl,--no-whole-archive")',
+              <<~CMAKE.chomp
+                if(APPLE)
+                  target_link_options(bpftime_vm PUBLIC "-Wl,-force_load,$<TARGET_FILE:bpftime_llvm_vm>")
+                else()
+                  target_link_options(bpftime_vm PUBLIC "-Wl,--whole-archive" "$<TARGET_FILE:bpftime_llvm_vm>" "-Wl,--no-whole-archive")
+                endif()
+              CMAKE
+    inreplace "vm/vm-core/CMakeLists.txt",
+              'target_link_options(bpftime_vm PUBLIC "-Wl,--whole-archive" "$<TARGET_FILE:bpftime_ubpf_vm>" "-Wl,--no-whole-archive")',
+              <<~CMAKE.chomp
+                if(APPLE)
+                  target_link_options(bpftime_vm PUBLIC "-Wl,-force_load,$<TARGET_FILE:bpftime_ubpf_vm>")
+                else()
+                  target_link_options(bpftime_vm PUBLIC "-Wl,--whole-archive" "$<TARGET_FILE:bpftime_ubpf_vm>" "-Wl,--no-whole-archive")
+                endif()
+              CMAKE
+
     inreplace "vm/compat/ubpf-vm/CMakeLists.txt",
               'target_link_options(bpftime_ubpf_vm PUBLIC "-Wl,--whole-archive" "$<TARGET_FILE:bpftime_ubpf_vm>" "-Wl,--no-whole-archive")',
               <<~CMAKE.chomp
